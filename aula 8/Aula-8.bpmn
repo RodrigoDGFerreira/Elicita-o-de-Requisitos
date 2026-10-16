@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_Restaurante" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="18.31.0">
+  <bpmn:collaboration id="Collaboration_Restaurante">
+    <bpmn:participant id="Participant_Restaurante" name="RESTAURANTE" processRef="Process_Restaurante" />
+    <bpmn:participant id="Participant_Pagamento" name="Pagamento" />
+    <bpmn:messageFlow id="MessageFlow_Pagamento" name="Cobrança" sourceRef="Task_SolicitarPagamento" targetRef="Participant_Pagamento" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Restaurante" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_Restaurante">
+      <bpmn:lane id="Lane_Atendimento" name="ATENDIMENTO">
+        <bpmn:flowNodeRef>StartEvent_Cliente</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_FazerPedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_AnotarPedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ItemDisponivel</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_OferecerOpcao</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ClienteAceita</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Cancelado</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_RegistrarPedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ParaleloInicio</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SolicitarPagamento</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Concluido</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Cozinha" name="COZINHA">
+        <bpmn:flowNodeRef>Task_VerificarPedido</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_MontarPedido</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Garcom" name="GARÇOM">
+        <bpmn:flowNodeRef>Task_PrepararMesa</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_ParaleloFim</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ServirPedido</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="StartEvent_Cliente" name="Cliente chega">
+      <bpmn:outgoing>Flow_01</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_FazerPedido" name="Fazer pedido">
+      <bpmn:incoming>Flow_01</bpmn:incoming>
+      <bpmn:outgoing>Flow_02</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_AnotarPedido" name="Anotar pedido">
+      <bpmn:incoming>Flow_02</bpmn:incoming>
+      <bpmn:outgoing>Flow_03</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_ItemDisponivel" name="Item disponível?">
+      <bpmn:incoming>Flow_03</bpmn:incoming>
+      <bpmn:outgoing>Flow_04</bpmn:outgoing>
+      <bpmn:outgoing>Flow_05</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_OferecerOpcao" name="Oferecer outra opção">
+      <bpmn:incoming>Flow_05</bpmn:incoming>
+      <bpmn:outgoing>Flow_06</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="Gateway_ClienteAceita" name="Cliente aceita?">
+      <bpmn:incoming>Flow_06</bpmn:incoming>
+      <bpmn:outgoing>Flow_07</bpmn:outgoing>
+      <bpmn:outgoing>Flow_08</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="EndEvent_Cancelado" name="Pedido cancelado">
+      <bpmn:incoming>Flow_08</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:task id="Task_RegistrarPedido" name="Registrar pedido no sistema">
+      <bpmn:incoming>Flow_04</bpmn:incoming>
+      <bpmn:incoming>Flow_07</bpmn:incoming>
+      <bpmn:outgoing>Flow_09</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:parallelGateway id="Gateway_ParaleloInicio">
+      <bpmn:incoming>Flow_09</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:task id="Task_VerificarPedido" name="Verificar pedido">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_MontarPedido" name="Montar pedido">
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_PrepararMesa" name="Preparar mesa e bebidas">
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:parallelGateway id="Gateway_ParaleloFim">
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:task id="Task_ServirPedido" name="Servir pedido">
+      <bpmn:incoming>Flow_15</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_SolicitarPagamento" name="Solicitar pagamento">
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_17</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="EndEvent_Concluido" name="Atendimento concluído">
+      <bpmn:incoming>Flow_17</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_01" sourceRef="StartEvent_Cliente" targetRef="Task_FazerPedido" />
+    <bpmn:sequenceFlow id="Flow_02" sourceRef="Task_FazerPedido" targetRef="Task_AnotarPedido" />
+    <bpmn:sequenceFlow id="Flow_03" sourceRef="Task_AnotarPedido" targetRef="Gateway_ItemDisponivel" />
+    <bpmn:sequenceFlow id="Flow_04" name="Sim" sourceRef="Gateway_ItemDisponivel" targetRef="Task_RegistrarPedido" />
+    <bpmn:sequenceFlow id="Flow_05" name="Não" sourceRef="Gateway_ItemDisponivel" targetRef="Task_OferecerOpcao" />
+    <bpmn:sequenceFlow id="Flow_06" sourceRef="Task_OferecerOpcao" targetRef="Gateway_ClienteAceita" />
+    <bpmn:sequenceFlow id="Flow_07" name="Sim" sourceRef="Gateway_ClienteAceita" targetRef="Task_RegistrarPedido" />
+    <bpmn:sequenceFlow id="Flow_08" name="Não" sourceRef="Gateway_ClienteAceita" targetRef="EndEvent_Cancelado" />
+    <bpmn:sequenceFlow id="Flow_09" sourceRef="Task_RegistrarPedido" targetRef="Gateway_ParaleloInicio" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Gateway_ParaleloInicio" targetRef="Task_VerificarPedido" />
+    <bpmn:sequenceFlow id="Flow_11" sourceRef="Gateway_ParaleloInicio" targetRef="Task_PrepararMesa" />
+    <bpmn:sequenceFlow id="Flow_12" sourceRef="Task_VerificarPedido" targetRef="Task_MontarPedido" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_MontarPedido" targetRef="Gateway_ParaleloFim" />
+    <bpmn:sequenceFlow id="Flow_14" sourceRef="Task_PrepararMesa" targetRef="Gateway_ParaleloFim" />
+    <bpmn:sequenceFlow id="Flow_15" sourceRef="Gateway_ParaleloFim" targetRef="Task_ServirPedido" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_ServirPedido" targetRef="Task_SolicitarPagamento" />
+    <bpmn:sequenceFlow id="Flow_17" sourceRef="Task_SolicitarPagamento" targetRef="EndEvent_Concluido" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_Restaurante">
+      <bpmndi:BPMNShape id="Participant_Pagamento_di" bpmnElement="Participant_Pagamento" isHorizontal="true">
+        <dc:Bounds x="155" y="80" width="1580" height="60" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_Restaurante_di" bpmnElement="Participant_Restaurante" isHorizontal="true">
+        <dc:Bounds x="155" y="150" width="1580" height="750" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Atendimento_di" bpmnElement="Lane_Atendimento" isHorizontal="true">
+        <dc:Bounds x="185" y="150" width="1550" height="350" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Cozinha_di" bpmnElement="Lane_Cozinha" isHorizontal="true">
+        <dc:Bounds x="185" y="500" width="1550" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Garcom_di" bpmnElement="Lane_Garcom" isHorizontal="true">
+        <dc:Bounds x="185" y="700" width="1550" height="200" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_Cliente_di" bpmnElement="StartEvent_Cliente">
+        <dc:Bounds x="217" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="197" y="295" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FazerPedido_di" bpmnElement="Task_FazerPedido">
+        <dc:Bounds x="295" y="230" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AnotarPedido_di" bpmnElement="Task_AnotarPedido">
+        <dc:Bounds x="445" y="230" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ItemDisponivel_di" bpmnElement="Gateway_ItemDisponivel" isMarkerVisible="true">
+        <dc:Bounds x="595" y="245" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="570" y="225" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_OferecerOpcao_di" bpmnElement="Task_OferecerOpcao">
+        <dc:Bounds x="570" y="350" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ClienteAceita_di" bpmnElement="Gateway_ClienteAceita" isMarkerVisible="true">
+        <dc:Bounds x="725" y="365" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="707" y="345" width="86" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Cancelado_di" bpmnElement="EndEvent_Cancelado">
+        <dc:Bounds x="732" y="452" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="774" y="462" width="100" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegistrarPedido_di" bpmnElement="Task_RegistrarPedido">
+        <dc:Bounds x="845" y="230" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ParaleloInicio_di" bpmnElement="Gateway_ParaleloInicio">
+        <dc:Bounds x="1000" y="245" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_VerificarPedido_di" bpmnElement="Task_VerificarPedido">
+        <dc:Bounds x="1100" y="560" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_MontarPedido_di" bpmnElement="Task_MontarPedido">
+        <dc:Bounds x="1250" y="560" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PrepararMesa_di" bpmnElement="Task_PrepararMesa">
+        <dc:Bounds x="1100" y="760" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ParaleloFim_di" bpmnElement="Gateway_ParaleloFim">
+        <dc:Bounds x="1400" y="775" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ServirPedido_di" bpmnElement="Task_ServirPedido">
+        <dc:Bounds x="1500" y="760" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SolicitarPagamento_di" bpmnElement="Task_SolicitarPagamento">
+        <dc:Bounds x="1500" y="230" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Concluido_di" bpmnElement="EndEvent_Concluido">
+        <dc:Bounds x="1672" y="252" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1647" y="295" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_01_di" bpmnElement="Flow_01">
+        <di:waypoint x="253" y="270" />
+        <di:waypoint x="295" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02_di" bpmnElement="Flow_02">
+        <di:waypoint x="395" y="270" />
+        <di:waypoint x="445" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03_di" bpmnElement="Flow_03">
+        <di:waypoint x="545" y="270" />
+        <di:waypoint x="595" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04_di" bpmnElement="Flow_04">
+        <di:waypoint x="645" y="270" />
+        <di:waypoint x="845" y="270" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="700" y="252" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_05_di" bpmnElement="Flow_05">
+        <di:waypoint x="620" y="295" />
+        <di:waypoint x="620" y="350" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="628" y="312" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06_di" bpmnElement="Flow_06">
+        <di:waypoint x="670" y="390" />
+        <di:waypoint x="725" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07_di" bpmnElement="Flow_07">
+        <di:waypoint x="775" y="390" />
+        <di:waypoint x="895" y="390" />
+        <di:waypoint x="895" y="310" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="800" y="372" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_08_di" bpmnElement="Flow_08">
+        <di:waypoint x="750" y="415" />
+        <di:waypoint x="750" y="452" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="758" y="425" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09_di" bpmnElement="Flow_09">
+        <di:waypoint x="945" y="270" />
+        <di:waypoint x="1000" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="1050" y="270" />
+        <di:waypoint x="1150" y="270" />
+        <di:waypoint x="1150" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="1025" y="295" />
+        <di:waypoint x="1025" y="800" />
+        <di:waypoint x="1100" y="800" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="1200" y="600" />
+        <di:waypoint x="1250" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="1350" y="600" />
+        <di:waypoint x="1425" y="600" />
+        <di:waypoint x="1425" y="775" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="1200" y="800" />
+        <di:waypoint x="1400" y="800" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
+        <di:waypoint x="1450" y="800" />
+        <di:waypoint x="1500" y="800" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <di:waypoint x="1550" y="760" />
+        <di:waypoint x="1550" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17_di" bpmnElement="Flow_17">
+        <di:waypoint x="1600" y="270" />
+        <di:waypoint x="1672" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_Pagamento_di" bpmnElement="MessageFlow_Pagamento">
+        <di:waypoint x="1550" y="230" />
+        <di:waypoint x="1550" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1558" y="178" width="50" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
